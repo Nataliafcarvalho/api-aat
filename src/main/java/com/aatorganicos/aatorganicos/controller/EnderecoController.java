@@ -7,14 +7,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aatorganicos.aatorganicos.model.Endereco;
+import com.aatorganicos.aatorganicos.repository.IEnderecoRepository;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/endereco")
+@AllArgsConstructor
 public class EnderecoController {
-    
+
+    private final IEnderecoRepository enderecoRepository;
+
     @GetMapping
     public List<Endereco> endereco() {
-        return null;
+        return enderecoRepository.findAll();
     }
 
 }

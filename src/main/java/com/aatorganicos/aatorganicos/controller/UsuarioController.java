@@ -7,14 +7,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aatorganicos.aatorganicos.model.Usuario;
+import com.aatorganicos.aatorganicos.repository.IUsuarioRepository;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/usuario")
+@AllArgsConstructor
 public class UsuarioController {
-    
+
+    private final IUsuarioRepository usuarioRepository;
+
     @GetMapping
     public List<Usuario> usuario() {
-        return null;
+        return usuarioRepository.findAll();
     }
 
 }

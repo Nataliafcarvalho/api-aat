@@ -7,14 +7,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aatorganicos.aatorganicos.model.Categoria;
+import com.aatorganicos.aatorganicos.repository.ICategoriaRepository;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/categoria")
+@AllArgsConstructor
 public class CategoriaController {
+
+    private final ICategoriaRepository categoriaRepository;
 
     @GetMapping
     public List<Categoria> categoria() {
-        return null;
+        return categoriaRepository.findAll();
     }
     
 }
