@@ -1,0 +1,34 @@
+package com.aatorganicos.aatorganicos.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Data;
+
+@Data
+@Entity
+public class Endereco {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long Id;
+
+    @Column(length = 10, nullable = false)
+    private Long Cep;
+
+    @Column(length = 120, nullable = true)
+    private String Logradouro;
+
+    @Column(length = 120, nullable = true)
+    private String Cidade;
+
+    @Column(length = 120, nullable = true)
+    private String Bairro;
+
+    @Column(length = 120, nullable = true)
+    private String Complemento;
+
+    private Long PessoaId;
+}
