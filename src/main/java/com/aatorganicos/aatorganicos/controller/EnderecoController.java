@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,7 +34,7 @@ public class EnderecoController {
     @GetMapping("/{id}")
     public ResponseEntity<Endereco> enderecoPorId(@PathVariable Long id) {
         return enderecoRepository.findById(id)
-                .map(record -> ResponseEntity.ok().body(record))
+                .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
 
     }
@@ -44,6 +45,21 @@ public class EnderecoController {
 
         return enderecoRepository.save(endereco);
 
+    }
+
+    @PutMapping
+    public ResponseEntity<Endereco> atualizaEndereco(@PathVariable Long id, @RequestBody Endereco endereco) {
+        return enderecoRepository.findById(id)
+                .map(data -> {
+                    data.setBairro(endereco.getBairro());
+                    data.setCep(endereco.getCep());
+                    data.setCidade(endereco.getCidade());
+                    data.setComplemento(endereco.getComplemento());
+                    data.setLogradouro(endereco.getLogradouro());
+                    Endereco updated = enderecoRepository.save(data);
+                    return ResponseEntity.ok().body(updated);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
 }

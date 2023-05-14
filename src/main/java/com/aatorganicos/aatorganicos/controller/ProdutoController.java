@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,7 +34,7 @@ public class ProdutoController {
     @GetMapping("/{id}")
     public ResponseEntity<Produto> produtoPorId(@PathVariable Long id) {
         return produtoRepository.findById(id)
-                .map(record -> ResponseEntity.ok().body(record))
+                .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -43,6 +44,19 @@ public class ProdutoController {
 
         return produtoRepository.save(produto);
 
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Produto> atualizaProduto(@PathVariable Long id, @RequestBody Produto produto) {
+        return produtoRepository.findById(id)
+                .map(data -> {
+                    data.setNome(produto.getNome());
+                    data.setDescricao(produto.getDescricao());
+                    data.setCategoriaId(produto.getCategoriaId());
+                    Produto updated = produtoRepository.save(data);
+                    return ResponseEntity.ok().body(updated);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
     
 }
