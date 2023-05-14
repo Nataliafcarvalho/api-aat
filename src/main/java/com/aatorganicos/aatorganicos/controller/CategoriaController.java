@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,8 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.aatorganicos.aatorganicos.model.Categoria;
 import com.aatorganicos.aatorganicos.repository.ICategoriaRepository;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 
+@Validated
 @RestController
 @RequestMapping("/api/categoria")
 @AllArgsConstructor
@@ -33,7 +38,7 @@ public class CategoriaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Categoria> categoriaPorId(@PathVariable Long id) {
+    public ResponseEntity<Categoria> categoriaPorId(@PathVariable @NotNull @Positive Long id) {
         return categoriaRepository.findById(id)
                 .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
@@ -41,13 +46,13 @@ public class CategoriaController {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Categoria criarCategoria(@RequestBody Categoria categoria) {
+    public Categoria criarCategoria(@RequestBody @Valid Categoria categoria) {
 
         return categoriaRepository.save(categoria);    
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Categoria> atualizaCategoria(@PathVariable Long id, @RequestBody Categoria categoria) {
+    public ResponseEntity<Categoria> atualizaCategoria(@PathVariable @NotNull @Positive Long id, @RequestBody Categoria categoria) {
         return categoriaRepository.findById(id)
                 .map(data -> {
                     data.setNome(categoria.getNome());
@@ -59,7 +64,7 @@ public class CategoriaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategoria(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCategoria(@PathVariable @NotNull @Positive Long id) {
         return categoriaRepository.findById(id)
                 .map(data -> {
                     categoriaRepository.deleteById(id);

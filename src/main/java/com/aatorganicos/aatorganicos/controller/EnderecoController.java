@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,8 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.aatorganicos.aatorganicos.model.Endereco;
 import com.aatorganicos.aatorganicos.repository.IEnderecoRepository;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 
+@Validated
 @RestController
 @RequestMapping("/api/endereco")
 @AllArgsConstructor
@@ -33,7 +38,7 @@ public class EnderecoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Endereco> enderecoPorId(@PathVariable Long id) {
+    public ResponseEntity<Endereco> enderecoPorId(@PathVariable @NotNull @Positive Long id) {
         return enderecoRepository.findById(id)
                 .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
@@ -42,14 +47,14 @@ public class EnderecoController {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Endereco criarEndereco(@RequestBody Endereco endereco) {
+    public Endereco criarEndereco(@RequestBody @Valid Endereco endereco) {
 
         return enderecoRepository.save(endereco);
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Endereco> atualizaEndereco(@PathVariable Long id, @RequestBody Endereco endereco) {
+    public ResponseEntity<Endereco> atualizaEndereco(@PathVariable @NotNull @Positive Long id, @RequestBody Endereco endereco) {
         return enderecoRepository.findById(id)
                 .map(data -> {
                     data.setBairro(endereco.getBairro());
@@ -64,7 +69,7 @@ public class EnderecoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEndereco(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEndereco(@PathVariable @NotNull @Positive Long id) {
         return enderecoRepository.findById(id)
                 .map(data -> {
                     enderecoRepository.deleteById(id);
