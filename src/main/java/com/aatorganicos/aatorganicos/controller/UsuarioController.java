@@ -17,29 +17,31 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aatorganicos.aatorganicos.model.Usuario;
-import com.aatorganicos.aatorganicos.repository.IUsuarioRepository;
+import com.aatorganicos.aatorganicos.service.UsuarioService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 
 @Validated
 @RestController
 @RequestMapping("/api/usuario")
-@AllArgsConstructor
 public class UsuarioController {
 
-    private final IUsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     @GetMapping
     public @ResponseBody List<Usuario> usuario() {
-        return usuarioRepository.findAll();
+        return usuarioService.usuario();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> usuarioPorId(@PathVariable @NotNull @Positive Long id) {
-        return usuarioRepository.findById(id)
+        return usuarioService.usuarioPorId(id)
             .map(data -> ResponseEntity.ok().body(data))
             .orElse(ResponseEntity.notFound().build());
     }
@@ -47,31 +49,22 @@ public class UsuarioController {
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public Usuario criarUsuario(@RequestBody @Valid Usuario usuario) {
-
-        return usuarioRepository.save(usuario);
-
+        return usuarioService.criarUsuario(usuario);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> atualizaUsuario(@PathVariable @NotNull @Positive Long id, @RequestBody Usuario usuario) {
-        return usuarioRepository.findById(id)
-                .map(data -> {
-                    data.setLogin(usuario.getLogin());
-                    data.setSenha(usuario.getSenha());
-                    Usuario updated = usuarioRepository.save(data);
-                    return ResponseEntity.ok().body(updated);
-                })
+        return usuarioService.atualizaUsuario(id, usuario)
+                .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable @NotNull @Positive Long id) {
-        return usuarioRepository.findById(id)
-                .map(data -> {
-                    usuarioRepository.deleteById(id);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        if(usuarioService.deleteUsuario(id)) {
+            return ResponseEntity.noContent().<Void>build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }

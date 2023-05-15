@@ -17,29 +17,31 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aatorganicos.aatorganicos.model.Produto;
-import com.aatorganicos.aatorganicos.repository.IProdutoRepository;
+import com.aatorganicos.aatorganicos.service.ProdutoService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 
 @Validated
 @RestController
 @RequestMapping("/api/produto")
-@AllArgsConstructor
 public class ProdutoController {
 
-    private final IProdutoRepository produtoRepository;
+    private final ProdutoService produtoService;
+
+    public ProdutoController(ProdutoService produtoService) {
+        this.produtoService = produtoService;
+    }
 
     @GetMapping
     public @ResponseBody List<Produto> produto() {
-        return produtoRepository.findAll();
+        return produtoService.produto();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Produto> produtoPorId(@PathVariable @NotNull @Positive Long id) {
-        return produtoRepository.findById(id)
+        return produtoService.produtoPorId(id)
                 .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -47,32 +49,24 @@ public class ProdutoController {
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public Produto criarProduto(@RequestBody @Valid Produto produto) {
-
-        return produtoRepository.save(produto);
-
+        return produtoService.criarProduto(produto);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Produto> atualizaProduto(@PathVariable @NotNull @Positive Long id, @RequestBody Produto produto) {
-        return produtoRepository.findById(id)
+        return produtoService.atualizaProduto(id, produto)
                 .map(data -> {
-                    data.setNome(produto.getNome());
-                    data.setDescricao(produto.getDescricao());
-                    data.setCategoriaId(produto.getCategoriaId());
-                    Produto updated = produtoRepository.save(data);
-                    return ResponseEntity.ok().body(updated);
+                    return ResponseEntity.ok().body(data);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduto(@PathVariable @NotNull @Positive Long id) {
-        return produtoRepository.findById(id)
-                .map(data -> {
-                    produtoRepository.deleteById(id);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        if(produtoService.deleteProduto(id)) {
+            return ResponseEntity.noContent().<Void>build();
+        }
+        return ResponseEntity.notFound().build();
     }
     
 }

@@ -17,29 +17,31 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aatorganicos.aatorganicos.model.Endereco;
-import com.aatorganicos.aatorganicos.repository.IEnderecoRepository;
+import com.aatorganicos.aatorganicos.service.EnderecoService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
 
 @Validated
 @RestController
 @RequestMapping("/api/endereco")
-@AllArgsConstructor
 public class EnderecoController {
 
-    private final IEnderecoRepository enderecoRepository;
+    private final EnderecoService enderecoService;
+
+    public EnderecoController(EnderecoService enderecoService) {
+        this.enderecoService = enderecoService;
+    }
 
     @GetMapping
     public @ResponseBody List<Endereco> endereco() {
-        return enderecoRepository.findAll();
+        return enderecoService.endereco();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Endereco> enderecoPorId(@PathVariable @NotNull @Positive Long id) {
-        return enderecoRepository.findById(id)
+        return enderecoService.enderecoPorId(id)
                 .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
 
@@ -48,34 +50,22 @@ public class EnderecoController {
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public Endereco criarEndereco(@RequestBody @Valid Endereco endereco) {
-
-        return enderecoRepository.save(endereco);
-
+        return enderecoService.criarEndereco(endereco);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Endereco> atualizaEndereco(@PathVariable @NotNull @Positive Long id, @RequestBody Endereco endereco) {
-        return enderecoRepository.findById(id)
-                .map(data -> {
-                    data.setBairro(endereco.getBairro());
-                    data.setCep(endereco.getCep());
-                    data.setCidade(endereco.getCidade());
-                    data.setComplemento(endereco.getComplemento());
-                    data.setLogradouro(endereco.getLogradouro());
-                    Endereco updated = enderecoRepository.save(data);
-                    return ResponseEntity.ok().body(updated);
-                })
+        return enderecoService.atualizaEndereco(id, endereco)
+                .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEndereco(@PathVariable @NotNull @Positive Long id) {
-        return enderecoRepository.findById(id)
-                .map(data -> {
-                    enderecoRepository.deleteById(id);
-                    return ResponseEntity.noContent().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+        if(enderecoService.deleteEndereco(id)) {
+            return ResponseEntity.noContent().<Void>build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
 }
