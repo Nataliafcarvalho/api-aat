@@ -9,6 +9,6 @@ public record EnderecoDto(
         @NotNull @NotBlank String Logradouro,
         @NotNull @NotBlank String Cidade,
         @NotNull @NotBlank String Bairro,
-        @NotNull @NotBlank String Complemento) {
+        ) {
 
 }
